@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MingleandJingle</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#09080d;color:#f0ecf8;overflow-x:hidden}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fsi{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes scanline{0%{top:10%}100%{top:85%}}
+@keyframes pulse2{0%,100%{box-shadow:0 0 0 0 rgba(62,207,178,0.4)}70%{box-shadow:0 0 0 15px rgba(62,207,178,0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes progress{from{width:0%}to{width:100%}}
+@keyframes waveform{0%,100%{height:4px}50%{height:20px}}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(9,8,13,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem}
+.nav-logo{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;background:linear-gradient(90deg,#e8607a,#9b6ef3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tabs{display:flex;gap:0.25rem}
+.nav-tab{background:none;border:none;color:#7a7388;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.4rem 0.9rem;border-radius:100px;transition:all 0.2s}
+.nav-tab.active{background:rgba(232,96,122,0.12);color:#e8607a}
+
+.page{display:none;padding-top:64px;min-height:100vh}
+.page.active{display:block}
+
+.btn-grad{background:linear-gradient(135deg,#e8607a,#9b6ef3);color:white;border:none;padding:0.8rem 1.8rem;border-radius:100px;font-size:0.82rem;font-weight:500;transition:all 0.2s;box-shadow:0 0 25px rgba(232,96,122,0.3)}
+.btn-grad:hover{transform:translateY(-2px)}
+.btn-out{background:rgba(255,255,255,0.05);color:#7a7388;border:1px solid rgba(255,255,255,0.07);padding:0.8rem 1.8rem;border-radius:100px;font-size:0.82rem;transition:all 0.2s}
+.btn-out:hover{color:#f0ecf8}
+
+/* PITCH */
+.pitch-hero{min-height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 2rem;background:radial-gradient(ellipse at 25% 40%,rgba(155,110,243,0.15) 0%,transparent 55%),radial-gradient(ellipse at 75% 65%,rgba(232,96,122,0.1) 0%,transparent 50%)}
+.badge{display:inline-flex;align-items:center;gap:0.5rem;border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:0.35rem 1rem;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#7a7388;margin-bottom:2rem;background:rgba(255,255,255,0.03)}
+.bdot{width:6px;height:6px;border-radius:50%;background:#e8607a;box-shadow:0 0 8px #e8607a;animation:blink 2s ease infinite}
+.pitch-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(3rem,10vw,7rem);line-height:0.9;letter-spacing:-0.03em;margin-bottom:1.5rem}
+.pk{color:#e8607a}.it{font-style:italic;font-weight:300}.vt{color:#9b6ef3}
+.pitch-sub{color:#7a7388;font-size:1rem;max-width:480px;line-height:1.75;margin-bottom:2.5rem}
+.crow{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.psec{padding:4rem 2rem}.psec.dk{background:#110f16}
+.eyebrow{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:#e8607a;text-align:center;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:center;gap:0.6rem}
+.eyebrow::before,.eyebrow::after{content:'';display:block;width:1.5rem;height:1px;background:#e8607a}
+.sec-t{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.8rem);text-align:center;margin-bottom:2.5rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:800px;margin:0 auto}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:900px;margin:0 auto}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;max-width:900px;margin:0 auto}
+.psc{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:2rem}
+.psc.pr{border-top:2px solid #e8607a}.psc.sl{border-top:2px solid #3ecfb2}
+.psico{font-size:1.8rem;margin-bottom:1rem}
+.psti{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;margin-bottom:0.75rem}
+.psli{list-style:none;display:flex;flex-direction:column;gap:0.6rem}
+.psli li{font-size:0.82rem;color:#7a7388;line-height:1.6;display:flex;gap:0.5rem}
+.stc{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:1.75rem 1.25rem}
+.stn{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,#9b6ef3,#e8607a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.75rem}
+.stt{font-size:0.88rem;font-weight:500;margin-bottom:0.4rem}
+.std{font-size:0.75rem;color:#7a7388;line-height:1.6}
+.mkc{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:2rem;text-align:center}
+.mkn{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:900;color:#f0b429;margin-bottom:0.5rem}
+.mkd{font-size:0.78rem;color:#7a7388;line-height:1.6}
+.pitch-cta{text-align:center;padding:4rem 2rem}
+
+/* APP */
+.app-wrap{background:#09080d;padding:2rem 1rem 4rem}
+.app-intro{text-align:center;margin-bottom:1.5rem}
+.app-intro h2{font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem;margin-bottom:0.5rem}
+.app-intro p{color:#7a7388;font-size:0.82rem;line-height:1.6}
+.app-phone{max-width:390px;margin:0 auto;background:#110f16;border:1px solid rgba(255,255,255,0.07);border-radius:36px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);min-height:720px;display:flex;flex-direction:column}
+.app-bar{background:#09080d;padding:0.75rem 1.5rem 0.4rem;display:flex;justify-content:space-between}
+.app-bar span{font-size:0.72rem;color:#7a7388}
+.app-bar span:first-child{color:#f0ecf8;font-weight:500}
+.app-hdr{padding:0.75rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,0.07)}
+.app-nm{font-family:'Fraunces',serif;font-weight:900;font-size:1rem;background:linear-gradient(90deg,#e8607a,#9b6ef3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.65rem}
+.locbar{display:flex;align-items:center;gap:0.5rem;background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:0.45rem 1rem;font-size:0.7rem;cursor:pointer;transition:border-color 0.2s}
+.locbar:hover{border-color:rgba(155,110,243,0.4)}
+.ldot{width:7px;height:7px;border-radius:50%;background:#3ecfb2;box-shadow:0 0 6px #3ecfb2;flex-shrink:0}
+.lnm{flex:1;color:#f0ecf8}.lch{color:#9b6ef3;font-size:0.62rem}
+.feed{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem}
+.feed::-webkit-scrollbar{display:none}
+.fc{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:18px;overflow:hidden}
+.fb{height:140px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative}
+.b1{background:linear-gradient(135deg,#1a0f2e,#2d1554)}
+.b2{background:linear-gradient(135deg,#0f1e1a,#103d32)}
+.b3{background:linear-gradient(135deg,#1e0f18,#3d1030)}
+.fon{position:absolute;top:0.6rem;right:0.6rem;background:rgba(62,207,178,0.15);border:1px solid rgba(62,207,178,0.4);border-radius:100px;padding:0.15rem 0.55rem;font-size:0.56rem;color:#3ecfb2;display:flex;align-items:center;gap:0.3rem}
+.fon::before{content:'';width:4px;height:4px;border-radius:50%;background:#3ecfb2}
+.flc{position:absolute;bottom:0.6rem;left:0.6rem;background:rgba(9,8,13,0.75);border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:0.15rem 0.55rem;font-size:0.58rem;color:#7a7388}
+.fbd{padding:0.9rem 1.1rem 1.1rem}
+.ftr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.3rem}
+.fnm{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900}
+.fag{font-size:0.7rem;color:#7a7388;padding-top:3px}
+.frl{font-size:0.72rem;color:#7a7388;margin-bottom:0.55rem}
+.fbi{font-size:0.75rem;color:rgba(240,236,248,0.6);line-height:1.55;margin-bottom:0.8rem}
+.fch{display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.9rem}
+.chip{padding:0.18rem 0.55rem;border-radius:100px;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;border:1px solid rgba(255,255,255,0.07);color:#7a7388}
+.chip.r{border-color:rgba(232,96,122,0.35);color:#e8607a;background:rgba(232,96,122,0.08)}
+.chip.v{border-color:rgba(155,110,243,0.35);color:#9b6ef3;background:rgba(155,110,243,0.08)}
+.chip.gd{border-color:rgba(240,180,41,0.35);color:#f0b429;background:rgba(240,180,41,0.08)}
+.chip.tl{border-color:rgba(62,207,178,0.35);color:#3ecfb2;background:rgba(62,207,178,0.08)}
+.fa3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem}
+.fa2{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem}
+.abt{padding:0.6rem;border-radius:9px;font-size:0.7rem;font-weight:500;border:none;transition:all 0.2s;text-align:center}
+.abt.mn{background:linear-gradient(135deg,#e8607a,#9b6ef3);color:white}
+.abt.mn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,96,122,0.35)}
+.abt.lm{background:rgba(155,110,243,0.15);color:#9b6ef3;border:1px solid rgba(155,110,243,0.3)}
+.abt.lm:hover{background:rgba(155,110,243,0.25)}
+.abt.ps{background:#110f16;color:#7a7388;border:1px solid rgba(255,255,255,0.07)}
+.abt.ps:hover{color:#f0ecf8}
+.anav{background:#09080d;border-top:1px solid rgba(255,255,255,0.07);display:flex;padding:0.65rem 0 0.9rem}
+.anb{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;background:none;border:none;color:#7a7388;font-size:0.52rem;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s;padding:0}
+.anb.on{color:#e8607a}
+.anb .ni{font-size:1.1rem}
+.verified-badge{display:inline-flex;align-items:center;gap:0.3rem;background:rgba(62,207,178,0.12);border:1px solid rgba(62,207,178,0.35);border-radius:100px;padding:0.15rem 0.55rem;font-size:0.58rem;color:#3ecfb2;margin-left:0.4rem;vertical-align:middle}
+
+/* LEARN MORE OVERLAY */
+#lm-overlay{display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);align-items:flex-end;justify-content:center;padding:0 0.5rem}
+#lm-overlay.open{display:flex}
+.lm-sheet{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:24px 24px 0 0;padding:1.5rem;width:100%;max-width:390px;animation:slideUp 0.3s ease;position:relative;max-height:90vh;overflow-y:auto}
+.lm-sheet::-webkit-scrollbar{display:none}
+.lm-handle{width:36px;height:3px;border-radius:100px;background:rgba(255,255,255,0.1);margin:0 auto 1.25rem}
+.lm-close{position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;color:#7a7388;font-size:1.1rem;line-height:1}
+
+/* TOGGLE */
+.lm-toggle{display:flex;background:#09080d;border-radius:100px;padding:3px;gap:2px;margin-bottom:1.25rem}
+.lm-toggle-btn{flex:1;padding:0.5rem;border-radius:100px;border:none;font-size:0.72rem;font-weight:500;transition:all 0.2s;color:#7a7388;background:none}
+.lm-toggle-btn.active{background:#18151f;color:#f0ecf8;box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+
+/* BIO VIEW */
+.lm-bio-view{display:block}
+.lm-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#e8607a,#9b6ef3);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 0.75rem;border:2px solid rgba(232,96,122,0.3)}
+.lm-name{font-family:'Fraunces',serif;font-weight:900;font-size:1.4rem;text-align:center;margin-bottom:0.2rem}
+.lm-role{font-size:0.75rem;color:#7a7388;text-align:center;margin-bottom:1rem}
+.lm-bio{font-size:0.82rem;color:rgba(240,236,248,0.7);line-height:1.65;text-align:center;margin-bottom:1.1rem;padding:0 0.5rem}
+.lm-chips{display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;margin-bottom:1rem}
+.lm-takes{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem}
+.lm-take{background:#110f16;border-radius:10px;padding:0.65rem 0.85rem;font-size:0.75rem;color:rgba(240,236,248,0.7);line-height:1.5;display:flex;gap:0.5rem;align-items:flex-start}
+.lm-take-label{color:#e8607a;flex-shrink:0;font-weight:500}
+
+/* VIDEO VIEW */
+.lm-video-view{display:none}
+.video-player{background:#000;border-radius:14px;overflow:hidden;margin-bottom:1rem;position:relative;aspect-ratio:9/16;max-height:340px}
+.video-screen{width:100%;height:100%;background:linear-gradient(135deg,#1a0f2e,#2d1554,#1a0f2e);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.video-avatar{font-size:4rem;margin-bottom:0.5rem;position:relative;z-index:1}
+.video-name-tag{position:absolute;bottom:50px;left:12px;right:12px}
+.video-name-inner{background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);border-radius:10px;padding:0.6rem 0.85rem}
+.video-nm{font-family:'Fraunces',serif;font-weight:900;font-size:1rem;margin-bottom:0.15rem}
+.video-rl{font-size:0.65rem;color:#7a7388}
+.video-controls{position:absolute;bottom:0;left:0;right:0;padding:0.75rem 0.85rem;background:linear-gradient(transparent,rgba(0,0,0,0.8))}
+.video-progress-bar{height:3px;background:rgba(255,255,255,0.2);border-radius:100px;margin-bottom:0.6rem;cursor:pointer}
+.video-progress-fill{height:100%;background:linear-gradient(90deg,#e8607a,#9b6ef3);border-radius:100px;width:0%;transition:width 0.1s linear}
+.video-bottom{display:flex;justify-content:space-between;align-items:center}
+.video-play{background:none;border:none;font-size:1.2rem;color:white;padding:0}
+.video-time{font-size:0.62rem;color:rgba(255,255,255,0.6)}
+.video-vol{background:none;border:none;font-size:1rem;color:rgba(255,255,255,0.6);padding:0}
+
+/* WAVEFORM */
+.waveform{display:flex;align-items:center;gap:2px;height:24px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;transition:opacity 0.3s}
+.waveform.playing{opacity:0.4}
+.wave-bar{width:3px;background:#e8607a;border-radius:100px;animation:waveform 0.8s ease-in-out infinite}
+.wave-bar:nth-child(1){animation-delay:0s}
+.wave-bar:nth-child(2){animation-delay:0.1s}
+.wave-bar:nth-child(3){animation-delay:0.2s}
+.wave-bar:nth-child(4){animation-delay:0.3s}
+.wave-bar:nth-child(5){animation-delay:0.4s}
+.wave-bar:nth-child(6){animation-delay:0.3s}
+.wave-bar:nth-child(7){animation-delay:0.2s}
+.wave-bar:nth-child(8){animation-delay:0.1s}
+.wave-bar:nth-child(9){animation-delay:0s}
+
+.video-caption{background:#110f16;border-radius:10px;padding:0.85rem 1rem;margin-bottom:1rem}
+.vc-label{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#e8607a;margin-bottom:0.35rem}
+.vc-text{font-size:0.78rem;color:rgba(240,236,248,0.75);line-height:1.6;font-style:italic}
+
+.lm-btns{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.25rem}
+
+/* FACE VERIFY */
+#verify-overlay{display:none;position:fixed;inset:0;z-index:9000;background:#000;align-items:center;justify-content:center;flex-direction:column}
+#verify-overlay.open{display:flex}
+.verify-topbar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem}
+.verify-title-top{font-family:'Fraunces',serif;font-weight:900;font-size:1rem;background:linear-gradient(90deg,#e8607a,#9b6ef3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.verify-cancel{background:none;border:none;color:#7a7388;font-size:0.8rem;letter-spacing:0.05em}
+.verify-step{display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;width:100%}
+.verify-step.active{display:flex}
+.verify-icon-big{font-size:4rem;margin-bottom:1.5rem}
+.verify-heading{font-family:'Fraunces',serif;font-weight:900;font-size:1.8rem;margin-bottom:0.75rem;color:white}
+.verify-sub{font-size:0.88rem;color:#7a7388;line-height:1.7;max-width:280px;margin-bottom:2rem}
+.verify-start{background:linear-gradient(135deg,#e8607a,#9b6ef3);color:white;border:none;padding:0.9rem 2.5rem;border-radius:100px;font-size:0.85rem;font-weight:500;transition:all 0.2s;box-shadow:0 0 25px rgba(232,96,122,0.3)}
+.verify-start:hover{transform:translateY(-2px)}
+.verify-points{list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:2rem;text-align:left}
+.verify-points li{font-size:0.8rem;color:#7a7388;display:flex;gap:0.6rem;align-items:flex-start}
+.verify-points li span.ic{color:#3ecfb2;flex-shrink:0}
+.camera-frame{position:relative;width:260px;height:320px;margin-bottom:2rem}
+.camera-feed{width:100%;height:100%;background:linear-gradient(135deg,#1a0f2e,#0f1e1a);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;overflow:hidden}
+.camera-overlay{position:absolute;inset:0;border-radius:20px;border:2px solid rgba(62,207,178,0.5)}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#3ecfb2,transparent);animation:scanline 2s ease-in-out infinite;top:10%}
+.corner{position:absolute;width:20px;height:20px;border-color:#3ecfb2;border-style:solid}
+.corner.tl{top:8px;left:8px;border-width:2px 0 0 2px}.corner.tr{top:8px;right:8px;border-width:2px 2px 0 0}
+.corner.bl{bottom:8px;left:8px;border-width:0 0 2px 2px}.corner.br{bottom:8px;right:8px;border-width:0 2px 2px 0}
+.camera-label{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#3ecfb2;background:rgba(0,0,0,0.6);padding:0.2rem 0.6rem;border-radius:100px;white-space:nowrap}
+.camera-tip{font-size:0.8rem;color:#7a7388;margin-bottom:1.5rem;max-width:260px}
+.camera-snap{background:white;color:#09080d;border:none;padding:0.85rem 2rem;border-radius:100px;font-size:0.82rem;font-weight:700;transition:all 0.2s}
+.camera-snap:hover{transform:scale(1.03)}
+.analyze-circle{width:150px;height:150px;border-radius:50%;background:rgba(62,207,178,0.08);border:2px solid rgba(62,207,178,0.3);display:flex;align-items:center;justify-content:center;font-size:4rem;margin-bottom:2rem;animation:pulse2 1.5s ease infinite;position:relative}
+.analyze-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid transparent;border-top-color:#3ecfb2;animation:spin 1s linear infinite}
+.analyze-points{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:2rem;width:100%;max-width:260px}
+.ap{display:flex;align-items:center;gap:0.75rem;font-size:0.78rem;color:#7a7388;padding:0.5rem 0.75rem;background:rgba(255,255,255,0.03);border-radius:8px;transition:all 0.4s}
+.ap.done{color:#3ecfb2}
+.ap-icon{font-size:0.9rem;color:#7a7388;width:1rem;text-align:center}
+.ap-bar{height:2px;background:rgba(255,255,255,0.07);border-radius:100px;flex:1}
+.ap-fill{height:100%;background:#3ecfb2;border-radius:100px;width:0%;transition:width 0.8s ease}
+.success-circle{width:120px;height:120px;border-radius:50%;background:rgba(62,207,178,0.15);border:2px solid #3ecfb2;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1.5rem;animation:fadeIn 0.5s ease}
+.success-title{font-family:'Fraunces',serif;font-weight:900;font-size:2rem;color:#3ecfb2;margin-bottom:0.75rem}
+.success-sub{font-size:0.88rem;color:#7a7388;line-height:1.7;max-width:260px;margin-bottom:2rem}
+.success-badge-preview{background:rgba(62,207,178,0.12);border:1px solid rgba(62,207,178,0.35);border-radius:12px;padding:1rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:0.75rem}
+.sbp-icon{font-size:1.5rem}
+.sbp-text{font-size:0.8rem;color:#f0ecf8;line-height:1.5}
+.sbp-text span{display:block;font-size:0.68rem;color:#7a7388;margin-top:0.15rem}
+.verify-done{background:linear-gradient(135deg,#3ecfb2,#9b6ef3);color:white;border:none;padding:0.9rem 2.5rem;border-radius:100px;font-size:0.85rem;font-weight:500;transition:all 0.2s}
+.verify-done:hover{transform:translateY(-2px)}
+
+/* MSG */
+.msg-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:8500;align-items:flex-end;justify-content:center;padding:0 0.5rem}
+.msg-modal.open{display:flex}
+.msg-sheet{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:390px;animation:slideUp 0.3s ease;position:relative}
+.msg-handle{width:36px;height:3px;border-radius:100px;background:rgba(255,255,255,0.1);margin:0 auto 1.25rem}
+.msg-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;margin-bottom:0.3rem}
+.msg-sub{font-size:0.73rem;color:#7a7388;margin-bottom:1.1rem}
+.msg-ta{width:100%;background:#09080d;border:1px solid rgba(255,255,255,0.07);border-radius:10px;color:#f0ecf8;padding:0.8rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;resize:none;height:90px;outline:none;line-height:1.6}
+.msg-ta:focus{border-color:rgba(155,110,243,0.4)}
+.msg-send{width:100%;background:linear-gradient(135deg,#e8607a,#9b6ef3);color:white;border:none;border-radius:10px;padding:0.8rem;font-size:0.8rem;font-weight:500;margin-top:0.65rem;transition:transform 0.15s}
+.msg-send:hover{transform:translateY(-1px)}
+.msg-close{position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;color:#7a7388;font-size:1.1rem;line-height:1}
+
+/* LOC */
+.loc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);z-index:8500;align-items:center;justify-content:center;padding:1rem}
+.loc-modal.open{display:flex}
+.loc-sheet{background:#18151f;border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:1.75rem;width:100%;max-width:350px;animation:fsi 0.25s ease}
+.loc-title{font-family:'Fraunces',serif;font-weight:900;font-size:1.15rem;margin-bottom:0.3rem}
+.loc-sub{font-size:0.75rem;color:#7a7388;margin-bottom:1.25rem;line-height:1.6}
+.loc-opts{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.9rem}
+.loc-opt{background:#110f16;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.85rem;cursor:pointer;transition:all 0.2s}
+.loc-opt:hover{border-color:rgba(155,110,243,0.35)}
+.loc-opt.sel{border-color:#9b6ef3;background:rgba(155,110,243,0.12)}
+.loc-opt-name{font-size:0.83rem;font-weight:500}
+.loc-opt-sub{font-size:0.65rem;color:#7a7388}
+.loc-cfm{width:100%;padding:0.8rem;background:linear-gradient(135deg,#e8607a,#9b6ef3);color:white;border:none;border-radius:10px;font-size:0.78rem;font-weight:500}
+
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(70px);background:#18151f;border:1px solid rgba(62,207,178,0.35);border-radius:100px;padding:0.65rem 1.4rem;font-size:0.78rem;color:#3ecfb2;white-space:nowrap;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);z-index:99999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.nav{padding:1rem 1.25rem}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">MingleandJingle</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('pitch')">🎯 Pitch</button>
+    <button class="nav-tab" onclick="showPage('app')">📱 App Demo</button>
+  </div>
+</nav>
+
+<!-- PITCH -->
+<div id="pitch" class="page active">
+  <div class="pitch-hero">
+    <div class="badge"><span class="bdot"></span>Hackathon Pitch · 2026</div>
+    <h1 class="pitch-title"><span class="pk">Mingle</span><br><span class="it">and</span><br><span class="vt">Jingle</span></h1>
+    <p class="pitch-sub">Your personal dating profile — location-aware, travel-ready, face-verified, with video or photo intro. Built for young professionals done with the algorithm.</p>
+    <div class="crow">
+      <button class="btn-grad" onclick="showPage('app')">See Live Demo →</button>
+      <button class="btn-out" onclick="document.getElementById('prob').scrollIntoView({behavior:'smooth'})">View Pitch ↓</button>
+    </div>
+  </div>
+
+  <div id="prob" class="psec dk">
+    <div class="eyebrow">The Problem</div>
+    <h2 class="sec-t">Dating apps are broken<br><span style="color:#e8607a;font-style:italic">for real people</span></h2>
+    <div class="g2">
+      <div class="psc pr"><div class="psico">😩</div><div class="psti">The Problems</div>
+        <ul class="psli">
+          <li><span>❌</span>300-char bios can't show who you are</li>
+          <li><span>❌</span>Locked to one city even when you travel</li>
+          <li><span>❌</span>Algorithm decides who sees you</li>
+          <li><span>❌</span>Catfishing — zero verification</li>
+          <li><span>❌</span>No video — you never see the real person</li>
+        </ul>
+      </div>
+      <div class="psc sl"><div class="psico">✨</div><div class="psti">Our Solution</div>
+        <ul class="psli">
+          <li><span style="color:#3ecfb2">✓</span>Rich personal profile — your story, your control</li>
+          <li><span style="color:#3ecfb2">✓</span>One-tap location switching for travelers</li>
+          <li><span style="color:#3ecfb2">✓</span>Face ID biometric verification — no catfishing</li>
+          <li><span style="color:#3ecfb2">✓</span>Video OR photo intro — you choose your format</li>
+          <li><span style="color:#3ecfb2">✓</span>Share your link anywhere — own your presence</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="psec">
+    <div class="eyebrow">How It Works</div>
+    <h2 class="sec-t">Four steps to your <span style="color:#9b6ef3;font-style:italic">first jingle</span></h2>
+    <div class="g4">
+      <div class="stc"><div class="stn">01</div><div class="stt">Build Your Page</div><div class="std">Bio, interests, hot takes — or record a 60-sec video intro. Your choice.</div></div>
+      <div class="stc"><div class="stn">02</div><div class="stt">Get Face Verified</div><div class="std">Biometric scan confirms you're real. Verified badge shows on your profile.</div></div>
+      <div class="stc"><div class="stn">03</div><div class="stt">Set Your Location</div><div class="std">Home or traveling? One tap so locals find you wherever you land.</div></div>
+      <div class="stc"><div class="stn">04</div><div class="stt">Start Mingling</div><div class="std">Share your link anywhere. People message you directly. No middleman.</div></div>
+    </div>
+  </div>
+
+  <div class="psec dk">
+    <div class="eyebrow">Why We're Different</div>
+    <h2 class="sec-t">The <span style="color:#3ecfb2;font-style:italic">game changers</span></h2>
+    <div class="g3" style="max-width:900px">
+      <div class="mkc" style="border-top:2px solid #e8607a">
+        <div style="font-size:2rem;margin-bottom:0.75rem">🛂</div>
+        <div class="mkn" style="font-size:1.5rem;color:#e8607a">Face ID</div>
+        <div class="mkd">Biometric verification means every profile is a real human. No bots, no catfish, no scams.</div>
+      </div>
+      <div class="mkc" style="border-top:2px solid #9b6ef3">
+        <div style="font-size:2rem;margin-bottom:0.75rem">🎥</div>
+        <div class="mkn" style="font-size:1.5rem;color:#9b6ef3">Video Intro</div>
+        <div class="mkd">See the real person before you match. 60-second video or photo — you decide how to show up.</div>
+      </div>
+      <div class="mkc" style="border-top:2px solid #f0b429">
+        <div style="font-size:2rem;margin-bottom:0.75rem">✈️</div>
+        <div class="mkn" style="font-size:1.5rem;color:#f0b429">Location Flip</div>
+        <div class="mkd">Land in Madrid and locals already know you're coming. No other app does this for travelers.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="psec">
+    <div class="eyebrow">Market</div>
+    <h2 class="sec-t">The numbers <span style="color:#f0b429;font-style:italic">don't lie</span></h2>
+    <div class="g3">
+      <div class="mkc"><div class="mkn">$8.4B</div><div class="mkd">Global dating market in 2024, growing 7% annually</div></div>
+      <div class="mkc"><div class="mkn">370M</div><div class="mkd">Dating app users worldwide — mostly 18-34 professionals</div></div>
+      <div class="mkc"><div class="mkn">67%</div><div class="mkd">Users say their profile doesn't represent who they really are</div></div>
+    </div>
+  </div>
+
+  <div class="pitch-cta">
+    <div class="eyebrow">Try It Now</div>
+    <h2 class="sec-t">See the <span style="color:#e8607a;font-style:italic">live demo</span></h2>
+    <p style="color:#7a7388;margin-bottom:2rem;font-size:0.9rem">Hit <strong style="color:#9b6ef3">Learn More</strong> on Maanav's card — toggle between Photo and Video intro. Hit <strong style="color:#3ecfb2">Get Verified</strong> to try Face ID.</p>
+    <button class="btn-grad" onclick="showPage('app')">Open App Demo →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="page">
+  <div class="app-wrap">
+    <div class="app-intro">
+      <h2>MingleandJingle</h2>
+      <p>Tap <strong style="color:#9b6ef3">Learn More</strong> → toggle 📸 Photo / 🎥 Video<br>Tap <strong style="color:#3ecfb2">Get Verified</strong> to try Face ID verification</p>
+    </div>
+    <div class="app-phone">
+      <div class="app-bar"><span>9:41</span><span>●●● 5G 🔋</span></div>
+      <div class="app-hdr">
+        <div class="app-nm">MingleandJingle ✦</div>
+        <div class="locbar" onclick="openLocModal()">
+          <div class="ldot"></div>
+          <span class="lnm" id="loc-display">Henderson, NV</span>
+          <span class="lch">Change ›</span>
+        </div>
+      </div>
+      <div class="feed">
+        <!-- MAANAV -->
+        <div class="fc">
+          <div class="fb b1">🧑‍⚕️
+            <div class="fon">Online now</div>
+            <div class="flc" id="card-loc">📍 Henderson, NV</div>
+          </div>
+          <div class="fbd">
+            <div class="ftr">
+              <div class="fnm">Maanav <span id="verified-badge" style="display:none" class="verified-badge">✓ Verified</span></div>
+              <div class="fag">24</div>
+            </div>
+            <div class="frl">Future DO · TUNCOM · Identical twin to Abi 👯</div>
+            <div class="fbi">Med student who plays soccer, basketball & pickleball and will debate you on sports, rap, and pop until you give in.</div>
+            <div class="fch">
+              <span class="chip r">⚽ Soccer</span><span class="chip v">🏀 Hoops</span>
+              <span class="chip gd">🎤 Rap Debates</span><span class="chip">🥒 Pickleball</span>
+              <span class="chip r">✈️ Traveler</span>
+            </div>
+            <div class="fa3">
+              <button class="abt mn" onclick="openMsg()">✦ Mingle</button>
+              <button class="abt lm" onclick="openLearnMore()">Learn More</button>
+              <button class="abt ps">Pass</button>
+            </div>
+          </div>
+        </div>
+        <!-- PRIYA -->
+        <div class="fc">
+          <div class="fb b2">🩺</div>
+          <div class="fbd">
+            <div class="ftr"><div class="fnm">Priya</div><div class="fag">25</div></div>
+            <div class="frl">NP Student · UNLV</div>
+            <div class="fbi">Healthcare by day, hiking on weekends. Will debate Taylor Swift's genre with you.</div>
+            <div class="fch"><span class="chip r">🏔️ Hiking</span><span class="chip v">🎵 Pop Fan</span><span class="chip">🩺 Healthcare</span></div>
+            <div class="fa2"><button class="abt mn">✦ Mingle</button><button class="abt ps">Pass</button></div>
+          </div>
+        </div>
+        <!-- ANANYA -->
+        <div class="fc">
+          <div class="fb b3">🧬</div>
+          <div class="fbd">
+            <div class="ftr"><div class="fnm">Ananya</div><div class="fag">23</div></div>
+            <div class="frl">PT Student · Henderson</div>
+            <div class="fbi">Rehab nerd. Kendrick won. Let's find a new restaurant together.</div>
+            <div class="fch"><span class="chip r">🎤 Kendrick Stan</span><span class="chip">🏔️ Hiking</span><span class="chip v">🍜 Foodie</span></div>
+            <div class="fa2"><button class="abt mn">✦ Mingle</button><button class="abt ps">Pass</button></div>
+          </div>
+        </div>
+        <!-- VERIFY CTA -->
+        <div class="fc" style="border:1px solid rgba(62,207,178,0.25);background:rgba(62,207,178,0.04)">
+          <div class="fbd" style="padding:1.5rem;text-align:center">
+            <div style="font-size:1.8rem;margin-bottom:0.75rem">🛂</div>
+            <div class="fnm" style="font-size:1rem;margin-bottom:0.4rem">Get Face Verified</div>
+            <div class="fbi" style="text-align:center;margin-bottom:1rem">Add a ✓ badge to your profile. Builds trust, gets more matches.</div>
+            <button class="abt mn" style="width:100%;background:linear-gradient(135deg,#3ecfb2,#9b6ef3)" onclick="openVerify()">🛂 Start Verification</button>
+          </div>
+        </div>
+      </div>
+      <div class="anav">
+        <button class="anb on"><span class="ni">✦</span>Discover</button>
+        <button class="anb"><span class="ni">💬</span>Messages</button>
+        <button class="anb"><span class="ni">👤</span>My Page</button>
+        <button class="anb"><span class="ni">⚙️</span>Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEARN MORE SHEET -->
+<div id="lm-overlay">
+  <div class="lm-sheet">
+    <div class="lm-handle"></div>
+    <button class="lm-close" onclick="closeLearnMore()">✕</button>
+
+    <!-- TOGGLE -->
+    <div class="lm-toggle">
+      <button class="lm-toggle-btn active" onclick="switchLmView('bio',this)">📸 Photo</button>
+      <button class="lm-toggle-btn" onclick="switchLmView('video',this)">🎥 Video</button>
+    </div>
+
+    <!-- BIO VIEW -->
+    <div class="lm-bio-view" id="lm-bio-view">
+      <div class="lm-avatar">🧑‍⚕️</div>
+      <div class="lm-name">Maanav <span id="lm-badge" style="display:none" class="verified-badge">✓ Verified</span></div>
+      <div class="lm-role">24 · Future DO · TUNCOM · Twin to Abi 👯 · <span id="lm-loc-txt" style="color:#3ecfb2">Henderson, NV</span></div>
+      <div class="lm-bio">Med student starting TUNCOM July 2026. Plays soccer, basketball & pickleball. Will debate you on Kendrick, LeBron, and Sabrina Carpenter — and probably win all three.</div>
+      <div class="lm-chips">
+        <span class="chip r">⚽ Soccer</span><span class="chip v">🏀 Hoops</span>
+        <span class="chip">🥒 Pickleball</span><span class="chip r">🏔️ Hiking</span>
+        <span class="chip gd">🍜 New Cuisine</span><span class="chip v">🎷 Alto Sax</span>
+        <span class="chip">👯 Has a Twin</span><span class="chip r">✈️ Traveler</span>
+      </div>
+      <div class="lm-takes">
+        <div class="lm-take"><span class="lm-take-label">🎤</span><span>Kendrick ended that beef before it started. Not debatable.</span></div>
+        <div class="lm-take"><span class="lm-take-label">🏀</span><span>LeBron's longevity wins the GOAT debate. Rings aren't everything.</span></div>
+        <div class="lm-take"><span class="lm-take-label">🎵</span><span>Sabrina Carpenter is carrying pop right now and nobody wants to admit it.</span></div>
+      </div>
+    </div>
+
+    <!-- VIDEO VIEW -->
+    <div class="lm-video-view" id="lm-video-view">
+      <div class="video-player">
+        <div class="video-screen">
+          <div class="waveform" id="waveform">
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          </div>
+          <div class="video-avatar">🧑‍⚕️</div>
+          <div class="video-name-tag">
+            <div class="video-name-inner">
+              <div class="video-nm">Maanav, 24 <span id="vid-badge" style="display:none" class="verified-badge">✓ Verified</span></div>
+              <div class="video-rl">Future DO · Henderson, NV · Identical twin to Abi</div>
+            </div>
+          </div>
+          <div class="video-controls">
+            <div class="video-progress-bar" onclick="scrubVideo(event)">
+              <div class="video-progress-fill" id="vid-progress"></div>
+            </div>
+            <div class="video-bottom">
+              <button class="video-play" id="play-btn" onclick="toggleVideo()">▶</button>
+              <span class="video-time" id="vid-time">0:00 / 0:42</span>
+              <button class="video-vol" onclick="toggleMute()">🔊</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="video-caption">
+        <div class="vc-label">🎙️ What Maanav says in his intro</div>
+        <div class="vc-text" id="vid-caption">"Hey, I'm Maanav — future DO, med student at TUNCOM. I play soccer, basketball, pickleball — basically any sport you want to debate. Speaking of debates, Kendrick ended it, Messi is the GOAT, and Sabrina Carpenter era is real. Fight me. Also I have an identical twin named Abi — yes you'll meet her eventually. If any of that sounds fun, send me a mingle."</div>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="lm-btns">
+      <button class="abt mn" onclick="closeLearnMore();openMsg()">✦ Send a Mingle</button>
+      <button class="abt ps" onclick="closeLearnMore()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- FACE ID -->
+<div id="verify-overlay">
+  <div class="verify-topbar">
+    <div class="verify-title-top">MingleandJingle ✦</div>
+    <button class="verify-cancel" onclick="closeVerify()">Cancel</button>
+  </div>
+  <div class="verify-step active" id="vstep1">
+    <div class="verify-icon-big">🛂</div>
+    <h2 class="verify-heading">Get Verified</h2>
+    <p class="verify-sub">Biometric face scan confirms you're a real person. Your data is never stored or shared.</p>
+    <ul class="verify-points">
+      <li><span class="ic">✓</span>Takes less than 30 seconds</li>
+      <li><span class="ic">✓</span>No photos saved to our servers</li>
+      <li><span class="ic">✓</span>Adds ✓ Verified badge to your profile</li>
+      <li><span class="ic">✓</span>Prevents catfishing and bots</li>
+    </ul>
+    <button class="verify-start" onclick="goVStep(2)">Start Face Scan →</button>
+  </div>
+  <div class="verify-step" id="vstep2">
+    <div class="camera-frame">
+      <div class="camera-feed">🧑‍⚕️
+        <div class="scan-line"></div>
+        <div class="camera-overlay"></div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="camera-label">Position your face in frame</div>
+      </div>
+    </div>
+    <p class="camera-tip">Look straight ahead, ensure your face is well lit.</p>
+    <button class="camera-snap" onclick="goVStep(3)">📸 Take Selfie</button>
+  </div>
+  <div class="verify-step" id="vstep3">
+    <div class="analyze-circle">🧑‍⚕️<div class="analyze-ring"></div></div>
+    <h2 class="verify-heading" style="font-size:1.4rem;margin-bottom:1.5rem">Analyzing...</h2>
+    <div class="analyze-points">
+      <div class="ap" id="ap1"><span class="ap-icon">👁️</span><span style="flex:1">Detecting facial features</span><div class="ap-bar"><div class="ap-fill" id="ap1-fill"></div></div></div>
+      <div class="ap" id="ap2"><span class="ap-icon">🔍</span><span style="flex:1">Checking liveness</span><div class="ap-bar"><div class="ap-fill" id="ap2-fill"></div></div></div>
+      <div class="ap" id="ap3"><span class="ap-icon">🛡️</span><span style="flex:1">Verifying identity</span><div class="ap-bar"><div class="ap-fill" id="ap3-fill"></div></div></div>
+      <div class="ap" id="ap4"><span class="ap-icon">✓</span><span style="flex:1">Issuing verification badge</span><div class="ap-bar"><div class="ap-fill" id="ap4-fill"></div></div></div>
+    </div>
+  </div>
+  <div class="verify-step" id="vstep4">
+    <div class="success-circle">✓</div>
+    <h2 class="success-title">Verified!</h2>
+    <p class="success-sub">Your identity is confirmed. Your ✓ Verified badge is now live on your profile.</p>
+    <div class="success-badge-preview">
+      <div class="sbp-icon">🧑‍⚕️</div>
+      <div class="sbp-text">Maanav, 24 <span class="verified-badge">✓ Verified</span><span>Future DO · TUNCOM · Identical twin to Abi</span></div>
+    </div>
+    <button class="verify-done" onclick="completeVerify()">Back to App ✦</button>
+  </div>
+</div>
+
+<!-- MSG -->
+<div class="msg-modal" id="msgModal">
+  <div class="msg-sheet">
+    <div class="msg-handle"></div>
+    <button class="msg-close" onclick="closeMsg()">✕</button>
+    <div class="msg-title">Mingle with Maanav ✦</div>
+    <div class="msg-sub">Send a real message — he'll reply if there's a vibe.</div>
+    <textarea class="msg-ta" id="msgText" placeholder="Hey Maanav, bold take on Sabrina Carpenter — I actually agree. What's your soccer team?"></textarea>
+    <button class="msg-send" onclick="sendMsg()">Send Message ✦</button>
+  </div>
+</div>
+
+<!-- LOC -->
+<div class="loc-modal" id="locModal">
+  <div class="loc-sheet">
+    <div class="loc-title">📍 Set Location</div>
+    <div class="loc-sub">Switch when you travel — locals find you before you land.</div>
+    <div class="loc-opts">
+      <div class="loc-opt sel" onclick="setLoc('Henderson, NV',this)"><span style="font-size:1.3rem">🏠</span><div><div class="loc-opt-name">Henderson, NV</div><div class="loc-opt-sub">Home base</div></div></div>
+      <div class="loc-opt" onclick="setLoc('Las Vegas, NV',this)"><span style="font-size:1.3rem">🎰</span><div><div class="loc-opt-name">Las Vegas, NV</div><div class="loc-opt-sub">Nearby</div></div></div>
+      <div class="loc-opt" onclick="setLoc('Madrid, Spain ✈️',this)"><span style="font-size:1.3rem">✈️</span><div><div class="loc-opt-name">Madrid, Spain</div><div class="loc-opt-sub">Upcoming trip — Sep 2026</div></div></div>
+      <div class="loc-opt" onclick="setLoc('Phoenix, AZ',this)"><span style="font-size:1.3rem">🌵</span><div><div class="loc-opt-name">Phoenix, AZ</div><div class="loc-opt-sub">Visiting occasionally</div></div></div>
+    </div>
+    <button class="loc-cfm" onclick="closeLocModal()">Confirm Location</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">✦ Done!</div>
+
+<script>
+// PAGE
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-tab')[id==='pitch'?0:1].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// LEARN MORE
+function openLearnMore(){
+  document.getElementById('lm-overlay').classList.add('open');
+  var show = document.getElementById('verified-badge').style.display!=='none';
+  document.getElementById('lm-badge').style.display = show?'inline-flex':'none';
+  document.getElementById('vid-badge').style.display = show?'inline-flex':'none';
+  resetVideo();
+}
+function closeLearnMore(){
+  document.getElementById('lm-overlay').classList.remove('open');
+  pauseVideo();
+}
+document.getElementById('lm-overlay').addEventListener('click',function(e){if(e.target===this)closeLearnMore()});
+
+// LM TOGGLE
+function switchLmView(view, btn){
+  document.querySelectorAll('.lm-toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(view==='bio'){
+    document.getElementById('lm-bio-view').style.display='block';
+    document.getElementById('lm-video-view').style.display='none';
+    pauseVideo();
+  } else {
+    document.getElementById('lm-bio-view').style.display='none';
+    document.getElementById('lm-video-view').style.display='block';
+  }
+}
+
+// VIDEO PLAYER
+var vidPlaying=false, vidProgress=0, vidInterval=null, vidMuted=false;
+var vidDuration=42;
+
+function toggleVideo(){
+  if(vidPlaying) pauseVideo();
+  else playVideo();
+}
+function playVideo(){
+  vidPlaying=true;
+  document.getElementById('play-btn').textContent='⏸';
+  document.getElementById('waveform').classList.add('playing');
+  vidInterval=setInterval(function(){
+    vidProgress+=100/vidDuration;
+    if(vidProgress>=100){vidProgress=100;pauseVideo();return;}
+    document.getElementById('vid-progress').style.width=vidProgress+'%';
+    var elapsed=Math.floor(vidProgress*vidDuration/100);
+    var m=Math.floor(elapsed/60), s=elapsed%60;
+    document.getElementById('vid-time').textContent='0:'+String(s).padStart(2,'0')+' / 0:42';
+  },1000);
+}
+function pauseVideo(){
+  vidPlaying=false;
+  document.getElementById('play-btn').textContent='▶';
+  document.getElementById('waveform').classList.remove('playing');
+  if(vidInterval){clearInterval(vidInterval);vidInterval=null;}
+}
+function resetVideo(){
+  pauseVideo();
+  vidProgress=0;
+  document.getElementById('vid-progress').style.width='0%';
+  document.getElementById('vid-time').textContent='0:00 / 0:42';
+}
+function scrubVideo(e){
+  var bar=e.currentTarget;
+  var rect=bar.getBoundingClientRect();
+  vidProgress=((e.clientX-rect.left)/rect.width)*100;
+  document.getElementById('vid-progress').style.width=vidProgress+'%';
+  var elapsed=Math.floor(vidProgress*vidDuration/100);
+  var s=elapsed%60;
+  document.getElementById('vid-time').textContent='0:'+String(s).padStart(2,'0')+' / 0:42';
+}
+function toggleMute(){
+  vidMuted=!vidMuted;
+  document.querySelector('.video-vol').textContent=vidMuted?'🔇':'🔊';
+}
+
+// VERIFY
+function openVerify(){goVStep(1);document.getElementById('verify-overlay').classList.add('open')}
+function closeVerify(){document.getElementById('verify-overlay').classList.remove('open')}
+function goVStep(n){
+  document.querySelectorAll('.verify-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('vstep'+n).classList.add('active');
+  if(n===3) runAnalysis();
+}
+function runAnalysis(){
+  var steps=[{id:'ap1',delay:300},{id:'ap2',delay:1200},{id:'ap3',delay:2100},{id:'ap4',delay:3000}];
+  steps.forEach(function(s){
+    setTimeout(function(){
+      document.getElementById(s.id+'-fill').style.width='100%';
+      setTimeout(function(){
+        document.getElementById(s.id).classList.add('done');
+        document.querySelector('#'+s.id+' .ap-icon').textContent='✓';
+      },800);
+    },s.delay);
+  });
+  setTimeout(function(){goVStep(4)},5000);
+}
+function completeVerify(){
+  ['verified-badge','lm-badge','vid-badge'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='inline-flex';
+  });
+  closeVerify();
+  ['ap1','ap2','ap3','ap4'].forEach(function(id){
+    document.getElementById(id).classList.remove('done');
+    var icons={ap1:'👁️',ap2:'🔍',ap3:'🛡️',ap4:'✓'};
+    document.querySelector('#'+id+' .ap-icon').textContent=icons[id];
+    document.getElementById(id+'-fill').style.width='0%';
+  });
+  showToast('✓ Verified badge added to your profile!');
+}
+
+// MSG
+function openMsg(){document.getElementById('msgModal').classList.add('open')}
+function closeMsg(){document.getElementById('msgModal').classList.remove('open')}
+function sendMsg(){
+  if(!document.getElementById('msgText').value.trim())return;
+  closeMsg();document.getElementById('msgText').value='';
+  showToast('✦ Mingle sent! Maanav will be notified.');
+}
+document.getElementById('msgModal').addEventListener('click',function(e){if(e.target===this)closeMsg()});
+
+// LOC
+function openLocModal(){document.getElementById('locModal').classList.add('open')}
+function closeLocModal(){document.getElementById('locModal').classList.remove('open')}
+function setLoc(name,el){
+  document.querySelectorAll('.loc-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('loc-display').textContent=name;
+  document.getElementById('card-loc').textContent='📍 '+name;
+  document.getElementById('lm-loc-txt').textContent=name;
+}
+document.getElementById('locModal').addEventListener('click',function(e){if(e.target===this)closeLocModal()});
+
+// TOAST
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},3200);
+}
+</script>
+</body>
+</html>
